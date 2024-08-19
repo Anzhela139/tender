@@ -37,23 +37,37 @@ import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
 const route = useRoute()
+
 const props = defineProps({
-  list: Array,
-  limit: Number,
-  count: Number
+  list: {
+    type: Array<{ title: string,
+  deadline_date: string,
+  category: string,
+  type: object
+  phase: string }>(),
+    default: () => []
+  },
+  limit: {
+    type: Number,
+    default: 1
+  },
+  count: {
+    type: Number,
+    default: 1
+  }
 })
 
 const emit = defineEmits(["triggerTransition"])
-const pageNumbers = ref([])
-const listToRender = ref([])
-const currentPage = ref(0)
-const head = ref(null)
+const pageNumbers = ref<Array<{}>>([])
+const listToRender = ref<Array<{}>>([])
+const currentPage = ref<number>(1)
+const head = ref<HTMLDivElement | null>(null)
 
 onMounted(() => {
     if (!route.query) {
         router.push({ name: 'tender-list', query: { page: 1 }})
     }
-    currentPage.value = parseInt(route.query) || 1;
+    currentPage.value = parseInt(String(route.query?.page)) || 1;
     const totalPages = Math.ceil(props.count / props.limit);
 
     for (let index = 0; index < totalPages; index++) {
@@ -70,16 +84,18 @@ watch(currentPage, () => {
     const start = (currentPage.value - 1) * props.limit
 
     listToRender.value = props.list.slice(start, start + props.limit);
-    head.value.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
+    if (head.value) {
+        head.value.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
+    }
 })
 
-const linkHandler = (id) => {
+const linkHandler = (id: string) => {
     router.push({ name: 'tender-detail', params: { id: id } })
 }
 
-const paginationLinkHandler = (link) => {
+const paginationLinkHandler = (link: string) => {
     router.push({ name: 'tender-list', query: { page: link }})
-    currentPage.value = link;
+    currentPage.value = parseInt(link);
     emit("triggerTransition")
 }
 </script>

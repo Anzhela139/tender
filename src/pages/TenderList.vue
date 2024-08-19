@@ -15,7 +15,7 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onBeforeMount } from 'vue';
 import PaginationEl from './../components/PaginationEl'
 import SearchEl from './../components/SearchEl'
@@ -38,12 +38,9 @@ onBeforeMount(async () => {
 
 });
 const handleTransition = () => {
-    console.log('handleTransition')
     const temp = tenders.value;
     tenders.value = [];
     tenders.value = temp;
-    // transition.value = false;
-    // transition.value = true;
 }
 </script>
 
