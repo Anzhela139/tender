@@ -1,14 +1,16 @@
 <template>
-    <div class="tender-detail container">
-      <button type="button" class="btn" @click="linkHandler">Go back</button>
-      <h1>Tender Detail</h1>
+    <div class="tender-detail ">
       <Transition name="detail">
-        <div class="tender-detail__container" v-if="tender">
-          <div class="tender-detail__name">Title</div><div class="tender-detail__value">{{ tender.title }}</div>
-          <div class="tender-detail__name">Deadline</div><div class="tender-detail__value">{{ tender.deadline_date }}</div>
-          <div class="tender-detail__name">Category</div><div class="tender-detail__value">{{ tender.category }}</div>
-          <div class="tender-detail__name">Type</div><div class="tender-detail__value">{{ tender.type?.name }}</div>
-          <div class="tender-detail__name">Phase</div><div class="tender-detail__value">{{ tender.phase }}</div>
+        <div class="container" v-if="tender && loaded">
+          <button type="button" class="btn" @click="linkHandler">Go back</button>
+          <h1>Tender Detail</h1>
+          <div class="tender-detail__container">
+            <div class="tender-detail__name">Title</div><div class="tender-detail__value">{{ tender.title }}</div>
+            <div class="tender-detail__name">Deadline</div><div class="tender-detail__value">{{ tender.deadline_date }}</div>
+            <div class="tender-detail__name">Category</div><div class="tender-detail__value">{{ tender.category }}</div>
+            <div class="tender-detail__name">Type</div><div class="tender-detail__value">{{ tender.type?.name }}</div>
+            <div class="tender-detail__name">Phase</div><div class="tender-detail__value">{{ tender.phase }}</div>
+          </div>
         </div>
       </Transition>
     </div>
@@ -22,7 +24,7 @@
       router.push({ name: 'tender-list' })
   }
   const tender = ref({})
-
+  const loaded = ref(false)
   onBeforeMount(async () => {
     fetch('https://api.test-webest.ru/element/?id=1')
       .then(async (res) => {
@@ -31,6 +33,7 @@
         console.log(data)
 
         tender.value = data
+        loaded.value = true
       })
       .catch((err) => console.log(err));
 

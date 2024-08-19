@@ -1,23 +1,25 @@
 <template>
     <div class="pagination">
-        <div class="tender-list__container">
-            <div class="tender-list__head">
-                <div class="tender-list__cell">№</div>
-                <div class="tender-list__cell">Title</div>
-                <div class="tender-list__cell">Deadline</div>
-                <div class="tender-list__cell">Category</div>
-                <div class="tender-list__cell">Type</div>
-                <div class="tender-list__cell">Phase</div>
+        <Transition name="pagination">
+            <div class="tender-list__container">
+                <div class="tender-list__head" ref="head">
+                    <div class="tender-list__cell">№</div>
+                    <div class="tender-list__cell">Title</div>
+                    <div class="tender-list__cell">Deadline</div>
+                    <div class="tender-list__cell">Category</div>
+                    <div class="tender-list__cell">Type</div>
+                    <div class="tender-list__cell">Phase</div>
+                </div>
+                <div @click="linkHandler(tender.id)" v-for="tender, index in listToRender" :key="tender.id" class="tender-list__row">
+                    <div class="tender-list__cell">{{ ((currentPage - 1) * props.limit) + index + 1 }}</div>
+                    <div class="tender-list__cell">{{ tender.title }}</div>
+                    <div class="tender-list__cell">{{ tender.deadline_date }}</div>
+                    <div class="tender-list__cell">{{ tender.category }}</div>
+                    <div class="tender-list__cell">{{ tender.type?.name }}</div>
+                    <div class="tender-list__cell">{{ tender.phase }}</div>
+                </div>
             </div>
-            <div @click="linkHandler(tender.id)" v-for="tender, index in listToRender" :key="tender.id" class="tender-list__row">
-                <div class="tender-list__cell">{{ ((currentPage - 1) * props.limit) + index + 1 }}</div>
-                <div class="tender-list__cell">{{ tender.title }}</div>
-                <div class="tender-list__cell">{{ tender.deadline_date }}</div>
-                <div class="tender-list__cell">{{ tender.category }}</div>
-                <div class="tender-list__cell">{{ tender.type?.name }}</div>
-                <div class="tender-list__cell">{{ tender.phase }}</div>
-            </div>
-        </div>
+        </Transition>
         <nav class="pagination-nav">
             <ul>
                 <li v-for="pageNumber, index in pageNumbers" :key="pageNumber.id">
@@ -30,8 +32,9 @@
 </template>
 
 <script setup>
-import { ref, defineProps, onMounted, watch  } from 'vue';
+import { ref, defineProps, defineEmits, onMounted, watch  } from 'vue';
 import { useRouter, useRoute } from 'vue-router'
+
 const router = useRouter()
 const route = useRoute()
 const props = defineProps({
@@ -39,17 +42,20 @@ const props = defineProps({
   limit: Number,
   count: Number
 })
+
+const emit = defineEmits(["triggerTransition"])
 const pageNumbers = ref([])
 const listToRender = ref([])
 const currentPage = ref(0)
+const head = ref(null)
+
 onMounted(() => {
-    console.log(`the component is now mounted.`)
     if (!route.query) {
         router.push({ name: 'tender-list', query: { page: 1 }})
     }
     currentPage.value = parseInt(route.query) || 1;
     const totalPages = Math.ceil(props.count / props.limit);
-    console.log(props.count, props.limit, totalPages)
+
     for (let index = 0; index < totalPages; index++) {
         pageNumbers.value.push({
             title: index + 1,
@@ -59,22 +65,26 @@ onMounted(() => {
 
     listToRender.value = props.list.slice(currentPage.value * props.limit, props.limit);
 })
+
 watch(currentPage, () => {
     const start = (currentPage.value - 1) * props.limit
-    console.log(currentPage.value, props.limit, start)
+
     listToRender.value = props.list.slice(start, start + props.limit);
+    head.value.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
 })
+
 const linkHandler = (id) => {
-    console.log(id)
     router.push({ name: 'tender-detail', params: { id: id } })
 }
+
 const paginationLinkHandler = (link) => {
     router.push({ name: 'tender-list', query: { page: link }})
     currentPage.value = link;
+    emit("triggerTransition")
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .tender-list__container {
     display: grid;
     grid-template-columns: 1fr;

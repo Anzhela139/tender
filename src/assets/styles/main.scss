@@ -50,14 +50,18 @@ a {
 .list-enter-active,
 .list-leave-active,
 .detail-enter-active,
-.detail-leave-active {
+.detail-leave-active,
+.pagination-enter-active,
+.pagination-leave-active {
   transition: all 0.5s ease;
 }
 
 .list-enter-from,
 .list-leave-to,
 .detail-enter-from,
-.detail-leave-to {
+.detail-leave-to,
+.pagination-enter-from,
+.pagination-leave-to {
   opacity: 0;
   transform: translateX(30px);
 }
